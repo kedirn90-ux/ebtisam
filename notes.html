@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Medical Notes - Dr. Fetiya</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-50 pb-28 font-sans">
+
+    <div class="bg-gradient-to-b from-blue-700 to-blue-500 text-white p-8 shadow-2xl rounded-b-[50px] text-center border-b-4 border-amber-400/30">
+        <img src="logo.png" alt="Logo" class="w-20 h-20 mx-auto rounded-full bg-white p-1 shadow-lg mb-3">
+        <h1 class="text-xl font-bold italic transition-all duration-500" id="quote-display">"Loading inspiration..."</h1>
+    </div>
+
+    <div class="p-4 -mt-6">
+        <div class="bg-white p-5 rounded-3xl shadow-xl border border-gray-100">
+            <input id="noteTitle" type="text" placeholder="Subject (e.g. Anatomy)" class="w-full p-3 mb-2 bg-gray-50 rounded-xl outline-none font-bold text-blue-900">
+            <textarea id="noteContent" rows="3" placeholder="Write your notes..." class="w-full p-3 bg-gray-50 rounded-xl outline-none text-sm mb-3"></textarea>
+            
+            <div class="flex gap-2">
+                <button onclick="startCamera()" class="flex-1 bg-gray-100 text-gray-700 py-3 rounded-xl font-bold text-sm active:scale-95 transition">
+                    <i class="fas fa-camera mr-2"></i> Photo
+                </button>
+                <button onclick="saveNote()" class="flex-[2] bg-blue-600 text-white py-3 rounded-xl font-bold text-sm shadow-lg shadow-blue-200 active:scale-95 transition">
+                    <i class="fas fa-check-circle mr-2"></i> Save Note
+                </button>
+            </div>
+
+            <div id="cameraArea" class="hidden mt-3 text-center">
+                <video id="video" class="w-full rounded-2xl border-2 border-blue-100" autoplay playsinline></video>
+                <button onclick="takePhoto()" class="mt-2 bg-red-500 text-white px-6 py-2 rounded-full font-bold text-xs uppercase tracking-widest">Capture</button>
+                <canvas id="canvas" class="hidden"></canvas>
+            </div>
+            <img id="photoPreview" class="hidden mt-3 w-full rounded-2xl border shadow-inner">
+        </div>
+    </div>
+
+    <div class="px-4 space-y-4" id="notesList"></div>
+
+    <div class="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md h-20 border-t border-gray-100 flex justify-around items-center px-4 z-50">
+        <a href="index.html" class="flex flex-col items-center gap-1 text-gray-400 hover:text-blue-600 transition">
+            <i class="fas fa-home text-lg"></i><span class="text-[9px] font-bold tracking-tighter">Home</span>
+        </a>
+        <a href="logbook.html" class="flex flex-col items-center gap-1 text-gray-400 hover:text-blue-600 transition">
+            <i class="fas fa-clipboard-list text-lg"></i><span class="text-[9px] font-bold tracking-tighter">Logs</span>
+        </a>
+        <button onclick="alert('You are doing great, Dr. Fetiya! ❤️')" class="relative -mt-12 bg-blue-600 w-16 h-16 rounded-full shadow-xl border-4 border-white text-white flex items-center justify-center">
+            <i class="fas fa-heart animate-pulse text-xl"></i>
+        </button>
+        <a href="notes.html" class="flex flex-col items-center gap-1 text-blue-600 transition">
+            <i class="fas fa-pen-fancy text-lg"></i><span class="text-[9px] font-bold tracking-tighter">Notes</span>
+        </a>
+        <a href="ref.html" class="flex flex-col items-center gap-1 text-gray-400 hover:text-blue-600 transition">
+            <i class="fas fa-book-medical text-lg"></i><span class="text-[9px] font-bold tracking-tighter">Ref</span>
+        </a>
+    </div>
+
+    <script>
+        // Motivation Quotes Logic
+        const quotes = [
+            "\"Medicine is learned by the bedside.\"",
+            "\"Stay hungry for knowledge, Dr. Fetiya.\"",
+            "\"Your hard work today saves lives tomorrow.\"",
+            "\"Great doctors never stop studying.\"",
+            "\"Empathy is as important as medicine.\""
+        ];
+        document.getElementById('quote-display').innerText = quotes[Math.floor(Math.random() * quotes.length)];
+
+        let notes = JSON.parse(localStorage.getItem('fetiya_v2_notes')) || [];
+        let capturedImage = null;
+
+        // Camera Functions
+        async function startCamera() {
+            const area = document.getElementById('cameraArea');
+            area.classList.remove('hidden');
+            const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+            document.getElementById('video').srcObject = stream;
+        }
+
+        function takePhoto() {
+            const video = document.getElementById('video');
+            const canvas = document.getElementById('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+            capturedImage = canvas.toDataURL('image/jpeg');
+            
+            document.getElementById('photoPreview').src = capturedImage;
+            document.getElementById('photoPreview').classList.remove('hidden');
+            document.getElementById('cameraArea').classList.add('hidden');
+            
+            video.srcObject.getTracks().forEach(track => track.stop());
+        }
+
+        // Save & Edit Functions
+        function saveNote() {
+            const title = document.getElementById('noteTitle').value;
+            const content = document.getElementById('noteContent').value;
+            if(!title) return alert("Please enter a subject!");
+
+            const newNote = { title, content, image: capturedImage, id: Date.now() };
+            notes.unshift(newNote);
+            localStorage.setItem('fetiya_v2_notes', JSON.stringify(notes));
+            
+            // Clear inputs
+            document.getElementById('noteTitle').value = '';
+            document.getElementById('noteContent').value = '';
+            document.getElementById('photoPreview').classList.add('hidden');
+            capturedImage = null;
+            renderNotes();
+        }
+
+        function editNote(id) {
+            const note = notes.find(n => n.id === id);
+            document.getElementById('noteTitle').value = note.title;
+            document.getElementById('noteContent').value = note.content;
+            if(note.image) {
+                capturedImage = note.image;
+                document.getElementById('photoPreview').src = note.image;
+                document.getElementById('photoPreview').classList.remove('hidden');
+            }
+            deleteNote(id);
+            window.scrollTo(0,0);
+        }
+
+        function deleteNote(id) {
+            notes = notes.filter(n => n.id !== id);
+            localStorage.setItem('fetiya_v2_notes', JSON.stringify(notes));
+            renderNotes();
+        }
+
+        function renderNotes() {
+            const list = document.getElementById('notesList');
+            list.innerHTML = notes.map(n => `
+                <div class="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
+                    ${n.image ? `<img src="${n.image}" class="w-full h-40 object-cover rounded-2xl mb-3 shadow-inner">` : ''}
+                    <h3 class="font-black text-blue-900 text-lg uppercase tracking-tight">${n.title}</h3>
+                    <p class="text-sm text-gray-600 mt-1 leading-relaxed">${n.content}</p>
+                    <div class="flex gap-4 mt-4 pt-3 border-t border-gray-50">
+                        <button onclick="editNote(${n.id})" class="text-blue-500 font-bold text-xs hover:underline"><i class="fas fa-edit mr-1"></i> EDIT</button>
+                        <button onclick="deleteNote(${n.id})" class="text-red-400 font-bold text-xs hover:underline"><i class="fas fa-trash mr-1"></i> DELETE</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        renderNotes();
+    </script>
+</body>
+</html>

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="am">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical Notes - Dr. Fetiya</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .note-card { transition: all 0.3s ease; }
+        .note-card:hover { transform: scale(1.02); }
+    </style>
+</head>
+<body class="bg-amber-50 pb-20">
+
+    <div class="bg-amber-500 text-white p-5 flex items-center gap-4 shadow-md sticky top-0 z-10">
+        <a href="index.html" class="text-xl"><i class="fas fa-arrow-left"></i></a>
+        <h1 class="text-xl font-bold">Medical Notes ✍️</h1>
+    </div>
+
+    <div class="p-4">
+        <div class="bg-white p-5 rounded-3xl shadow-lg border border-amber-100">
+            <input type="text" id="noteTitle" class="w-full p-2 mb-2 font-bold text-gray-700 border-b focus:outline-none border-amber-100" placeholder="ርዕስ (ለምሳሌ፡ Ward Round)">
+            
+            <textarea id="noteContent" class="w-full p-2 h-24 text-gray-600 focus:outline-none resize-none" placeholder="ፈጣን ነጥቦችን እዚህ ይጻፉ..."></textarea>
+            
+            <div class="mt-3 p-3 bg-amber-50 rounded-2xl border-2 border-dashed border-amber-200">
+                <label class="flex items-center justify-center gap-2 cursor-pointer text-amber-700 font-bold text-sm">
+                    <i class="fas fa-camera text-xl"></i>
+                    <span>ፎቶ አንሺ / ጨምሪ</span>
+                    <input type="file" id="noteImage" accept="image/*" capture="environment" class="hidden" onchange="previewImage(this)">
+                </label>
+                <div id="imagePreviewContainer" class="hidden mt-3 relative">
+                    <img id="imagePreview" src="" class="rounded-xl w-full h-40 object-cover shadow-inner">
+                    <button onclick="removeImage()" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center shadow-lg">
+                        <i class="fas fa-times text-xs"></i>
+                    </button>
+                </div>
+            </div>
+
+            <button onclick="saveNote()" class="w-full mt-4 bg-amber-600 text-white font-bold py-4 rounded-2xl shadow-xl active:scale-95 transition flex items-center justify-center gap-2">
+                <i class="fas fa-save"></i> ማስታወሻውን መዝግብ
+            </button>
+        </div>
+    </div>
+
+    <div class="px-4 space-y-4" id="notesList">
+        </div>
+
+    <script>
+        let currentImageData = "";
+
+        // ፎቶውን አስቀድሞ ለማየት
+        function previewImage(input) {
+            const container = document.getElementById('imagePreviewContainer');
+            const preview = document.getElementById('imagePreview');
+            
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    currentImageData = e.target.result; // Base64 ዳታ
+                    preview.src = currentImageData;
+                    container.classList.remove('hidden');
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function removeImage() {
+            currentImageData = "";
+            document.getElementById('noteImage').value = "";
+            document.getElementById('imagePreviewContainer').classList.add('hidden');
+        }
+
+        function saveNote() {
+            const title = document.getElementById('noteTitle').value;
+            const content = document.getElementById('noteContent').value;
+
+            if (!title && !content && !currentImageData) {
+                alert("እባክዎ መረጃ ያስገቡ!");
+                return;
+            }
+
+            const note = {
+                title: title || "ያለ ርዕስ",
+                content: content,
+                image: currentImageData,
+                date: new Date().toLocaleString('am-ET')
+            };
+
+            let notes = JSON.parse(localStorage.getItem('medical_notes')) || [];
+            notes.unshift(note);
+            
+            try {
+                localStorage.setItem('medical_notes', JSON.stringify(notes));
+                // ማጽጃ
+                document.getElementById('noteTitle').value = '';
+                document.getElementById('noteContent').value = '';
+                removeImage();
+                displayNotes();
+            } catch (e) {
+                alert("ሚሞሪ ሞልቷል! እባክዎ አንዳንድ ፎቶዎችን ያጥፉ።");
+            }
+        }
+
+        function displayNotes() {
+            const list = document.getElementById('notesList');
+            const notes = JSON.parse(localStorage.getItem('medical_notes')) || [];
+
+            if (notes.length === 0) {
+                list.innerHTML = "<div class='text-center py-10 text-amber-300'><i class='fas fa-sticky-note text-5xl mb-3'></i><p class='italic'>ምንም ማስታወሻ የለም</p></div>";
+                return;
+            }
+
+            list.innerHTML = notes.map((n, index) => `
+                <div class="note-card bg-white p-4 rounded-3xl shadow-md border-l-8 border-amber-500 relative overflow-hidden">
+                    <button onclick="deleteNote(${index})" class="absolute top-3 right-3 text-gray-300 hover:text-red-500 transition">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                    ${n.image ? `<img src="${n.image}" class="w-full h-32 object-cover rounded-2xl mb-3 border">` : ''}
+                    <h4 class="font-black text-gray-800 text-lg leading-tight">${n.title}</h4>
+                    <p class="text-sm text-gray-600 mt-2 whitespace-pre-wrap">${n.content}</p>
+                    <div class="text-[10px] text-gray-400 mt-4 flex items-center gap-1 border-t pt-2">
+                        <i class="far fa-clock"></i> ${n.date}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function deleteNote(index) {
+            if (confirm("ይህንን ማስታወሻ ማጥፋት ይፈልጋሉ?")) {
+                let notes = JSON.parse(localStorage.getItem('medical_notes'));
+                notes.splice(index, 1);
+                localStorage.setItem('medical_notes', JSON.stringify(notes));
+                displayNotes();
+            }
+        }
+
+        displayNotes();
+    </script>
+</body>
+</html>

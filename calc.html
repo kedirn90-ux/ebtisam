@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dosage Calculator - Dr. Fetiya</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-blue-50 pb-10">
+
+    <div class="bg-rose-500 text-white p-5 flex items-center gap-4 shadow-md">
+        <a href="index.html" class="text-xl"><i class="fas fa-arrow-left"></i></a>
+        <h1 class="text-xl font-bold italic text-center w-full">Pediatric Dosage Calc</h1>
+    </div>
+
+    <div class="p-6">
+        <div class="bg-white p-6 rounded-3xl shadow-xl border border-rose-100">
+            <h2 class="text-gray-700 font-bold mb-6 flex items-center gap-2">
+                <i class="fas fa-pills text-rose-500"></i> Calculate Dose
+            </h2>
+
+            <div class="space-y-5">
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 mb-1 uppercase tracking-wider">Child's Weight (kg)</label>
+                    <input type="number" id="weight" class="w-full p-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:border-rose-400 outline-none transition" placeholder="e.g. 10">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 mb-1 uppercase tracking-wider">Medicine Type</label>
+                    <select id="medType" class="w-full p-4 bg-gray-50 border-2 border-gray-100 rounded-2xl outline-none focus:border-rose-400">
+                        <option value="amox">Amoxicillin (125mg/5ml)</option>
+                        <option value="para">Paracetamol (120mg/5ml)</option>
+                        <option value="ibu">Ibuprofen (100mg/5ml)</option>
+                        <option value="aug">Augmentin (156.25mg/5ml)</option>
+                        <option value="cefi">Cefixime (100mg/5ml)</option>
+                        <option value="azir">Azithromycin (200mg/5ml)</option>
+                    </select>
+                </div>
+
+                <button onclick="calculate()" class="w-full bg-rose-500 text-white font-black py-4 rounded-2xl shadow-lg shadow-rose-200 hover:bg-rose-600 active:scale-95 transition mt-4">
+                    Calculate
+                </button>
+            </div>
+        </div>
+
+        <div id="resultBox" class="hidden mt-6 p-6 bg-gradient-to-br from-rose-500 to-rose-600 rounded-3xl text-white shadow-xl animate-bounce-short">
+            <p class="text-xs opacity-80 mb-1 uppercase font-bold">Calculated Dose:</p>
+            <h3 id="resultText" class="text-3xl font-black">-- ml</h3>
+            
+        </div>
+    </div>
+
+    <script>
+        function calculate() {
+            const weight = parseFloat(document.getElementById('weight').value);
+            const med = document.getElementById('medType').value;
+            const resultBox = document.getElementById('resultBox');
+            const resultText = document.getElementById('resultText');
+
+            if (!weight || weight <= 0) {
+                alert("Please enter a valid weight!");
+                return;
+            }
+
+            let doseMl = 0;
+            let frequency = "";
+
+            if (med === 'amox') {
+                doseMl = (weight * 15 * 5) / 125;
+                frequency = "every 8 hours";
+            } else if (med === 'para') {
+                doseMl = (weight * 15 * 5) / 120;
+                frequency = "every 6 hours";
+            } else if (med === 'ibu') {
+                doseMl = (weight * 10 * 5) / 100;
+                frequency = "every 8 hours";
+            } else if (med === 'aug') {
+                doseMl = (weight * 15 * 5) / 156.25;
+                frequency = "every 12 hours";
+            } else if (med === 'cefi') {
+                doseMl = (weight * 8 * 5) / 100;
+                frequency = "once daily";
+            } else if (med === 'azir') {
+                doseMl = (weight * 10 * 5) / 200;
+                frequency = "once daily";
+            }
+
+            resultText.innerText = doseMl.toFixed(1) + " ml (" + frequency + ")";
+            resultBox.classList.remove('hidden');
+        }
+
+        function showSurprise() {
+            alert(" Feti!, today's hard work is the foundation for your great success tomorrow! I love you ❤️");
+        }
+    </script>
+
+    <style>
+        @keyframes bounce-short {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        .animate-bounce-short { animation: bounce-short 0.5s ease-in-out; }
+    </style>
+
+    <div class="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md h-20 border-t border-gray-100 flex justify-around items-center px-4 z-50 shadow-[0_-5px_20px_rgba(0,0,0,0.05)]">
+        <a href="index.html" class="flex flex-col items-center gap-1 text-gray-400 hover:text-blue-600 transition">
+            <i class="fas fa-home text-xl"></i>
+            <span class="text-[10px] font-bold">Home</span>
+        </a>
+        <a href="logbook.html" class="flex flex-col items-center gap-1 text-gray-400 hover:text-blue-600 transition">
+            <i class="fas fa-file-medical text-xl"></i>
+            <span class="text-[10px] font-bold">Logs</span>
+        </a>
+        <button onclick="showSurprise()" class="relative -mt-10 bg-gradient-to-tr from-rose-500 to-pink-400 w-14 h-14 rounded-full shadow-lg shadow-rose-200 border-4 border-white flex items-center justify-center text-white active:scale-90 transition">
+            <i class="fas fa-heart animate-pulse"></i>
+        </button>
+        <a href="notes.html" class="flex flex-col items-center gap-1 text-gray-400 hover:text-blue-600 transition">
+            <i class="fas fa-pen-nib text-xl"></i>
+            <span class="text-[10px] font-bold">Notes</span>
+        </a>
+        <a href="ref.html" class="flex flex-col items-center gap-1 text-gray-400 hover:text-blue-600 transition">
+            <i class="fas fa-book text-xl"></i>
+            <span class="text-[10px] font-bold">Ref</span>
+        </a>
+    </div>
+
+</body>
+</html>
