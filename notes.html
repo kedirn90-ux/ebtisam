@@ -46,7 +46,7 @@
         <a href="logbook.html" class="flex flex-col items-center gap-1 text-gray-400 hover:text-blue-600 transition">
             <i class="fas fa-clipboard-list text-lg"></i><span class="text-[9px] font-bold tracking-tighter">Logs</span>
         </a>
-        <button onclick="alert('You are doing great, Dr. Fetiya! ❤️')" class="relative -mt-12 bg-blue-600 w-16 h-16 rounded-full shadow-xl border-4 border-white text-white flex items-center justify-center">
+        <button onclick="alert('You are doing great! ❤️')" class="relative -mt-12 bg-blue-600 w-16 h-16 rounded-full shadow-xl border-4 border-white text-white flex items-center justify-center">
             <i class="fas fa-heart animate-pulse text-xl"></i>
         </button>
         <a href="notes.html" class="flex flex-col items-center gap-1 text-blue-600 transition">
@@ -56,6 +56,16 @@
             <i class="fas fa-book-medical text-lg"></i><span class="text-[9px] font-bold tracking-tighter">Ref</span>
         </a>
     </div>
+
+    <div class="mt-6 p-4 border-2 border-dashed border-blue-200 rounded-2xl bg-blue-50/50">
+    <label class="flex flex-col items-center cursor-pointer">
+        <i class="fas fa-cloud-upload-alt text-blue-500 text-3xl mb-2"></i>
+        <span class="text-blue-700 font-medium text-sm">Upload Medical Docs (PDF/Image)</span>
+        <input type="file" id="fileUpload" class="hidden" accept="image/*,.pdf" onchange="handleFile()">
+    </label>
+    <div id="fileList" class="mt-4 space-y-2">
+        </div>
+</div>
 
     <script>
         // Motivation Quotes Logic
@@ -147,6 +157,42 @@
         }
 
         renderNotes();
+
+function handleFile() {
+    const fileInput = document.getElementById('fileUpload');
+    const fileList = document.getElementById('fileList');
+    const file = fileInput.files[0];
+
+    if (file) {
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+            const fileRow = document.createElement('div');
+            fileRow.className = "mt-4 bg-white p-3 rounded-xl shadow-md border border-blue-100";
+            
+            // ፋይሉ ምስል ከሆነ ምስሉን ያሳያል፣ PDF ከሆነ ሊንክ ይሰጣል
+            if (file.type.startsWith('image/')) {
+                fileRow.innerHTML = `
+                    <p class="text-[10px] font-bold text-gray-500 mb-2">${file.name}</p>
+                    <img src="${e.target.result}" class="w-full rounded-lg shadow-inner">
+                `;
+            } else if (file.type === 'application/pdf') {
+                fileRow.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-file-pdf text-rose-500"></i>
+                            <span class="text-xs font-medium truncate w-32">${file.name}</span>
+                        </div>
+                        <a href="${e.target.result}" target="_blank" class="text-blue-600 text-xs font-bold underline">Open PDF</a>
+                    </div>
+                `;
+            }
+            fileList.appendChild(fileRow);
+        };
+
+        reader.readAsDataURL(file); // ፋይሉን ወደ ዳታ ይቀይረዋል
+    }
+}
     </script>
 </body>
 </html>
