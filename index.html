@@ -110,18 +110,26 @@
         </a>
     </div>
 
-    <script>
-        const PIN = "1234"; 
-        let entry = prompt("Please enter Dr. Fetiya's access PIN:");
+  <script>
+    const PIN = "1234"; 
+    let entry = prompt("Please enter Dr. Fetiya's access PIN:");
 
-        if (entry === PIN) {
-            document.body.style.display = "block";
-        } else {
-            alert("Incorrect PIN! Access denied.");
-            window.location.reload(); 
-        }
+    if (entry === PIN) {
+        document.body.style.display = "block";
+    } else {
+        alert("Incorrect PIN! Access denied.");
+        window.location.reload(); 
+    }
 
- 
+    function showSurprise() {
+        const messages = [
+            "وَقُل رَّبِّ زِدْنِي عِلምًا\n\n«ጌታዬ ሆይ! እውቀትን ጨምርልኝ» በል (ሱረቱ ጣሀ፡ 114) ❤️",
+            "وَتَوَكَّلْ عَلَى اللَّهِ ۚ وَكَفَىٰ بِاللَّهِ وَكِيلاً\n\nበአላህ ላይም ተመካ፤ መመኪያም በአላህ በቃ። (ሱረቱ አል-አህዛብ፡ 3) ✨",
+            "وَمَا تَوْفِيقِي إِلَّا بِاللَّهِ ۚ عَلَيْهِ تَوَكَّلْتُ وَإِلَيْهِ أُنِيبُ\n\nስኬቴም በአላህ እንጂ በሌላ አይደለም፤ በእርሱ ላይ ተመካሁ፤ ወደ እርሱም እመለሳለሁ። (ሱረቱ ሁድ፡ 88) 🤲"
+        ];
+        const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+        alert(randomMessage);
+    }
 </script>
 </body>
 </html>
