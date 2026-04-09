@@ -2,18 +2,20 @@
   "name": "Dr. Fetiya's Medical Suite",
   "short_name": "DF Suite",
   "description": "Medical Dashboard for Dr. Fetiya",
-  "icons": [
+ "icons": [
     {
       "src": "fet1.jpg",
       "sizes": "192x192",
-      "type": "image/jpeg"
+      "type": "image/jpeg",
+      "purpose": "any maskable"
     },
     {
       "src": "fet1.jpg",
       "sizes": "512x512",
-      "type": "image/jpeg"
+      "type": "image/jpeg",
+      "purpose": "any maskable"
     }
-  ],
+]
   "start_url": "/index.html",
   "display": "standalone",
   "background_color": "#1d4ed8",
